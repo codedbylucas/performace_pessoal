@@ -40,13 +40,19 @@ const authenticate = (req: any, res: any, next: any) => {
 // Helpers
 async function findUserByEmail(email: string) {
   const { data, error } = await supabase.from("users").select("*").eq("email", email).single();
-  if (error && error.code !== "PGRST116") throw error; // 116 = no rows
+  if (error && error.code !== "PGRST116") {
+    console.error("Supabase findUserByEmail error", error);
+    throw error;
+  }
   return data;
 }
 
 async function insertUser(user: any) {
   const { data, error } = await supabase.from("users").insert(user).select().single();
-  if (error) throw error;
+  if (error) {
+    console.error("Supabase insertUser error", error);
+    throw error;
+  }
   return data;
 }
 
@@ -60,7 +66,10 @@ async function upsertSyncData(items: any[], userId: string, version: number) {
     updated_at: version,
   }));
   const { error } = await supabase.from("sync_data").upsert(payload, { onConflict: "id" });
-  if (error) throw error;
+  if (error) {
+    console.error("Supabase upsertSyncData error", error);
+    throw error;
+  }
 }
 
 // API Routes
@@ -85,8 +94,8 @@ app.post("/api/auth/signup", async (req, res) => {
     const token = jwt.sign({ id, email, name }, JWT_SECRET);
     res.json({ token, user: { id, name, email } });
   } catch (e: any) {
-    console.error(e);
-    res.status(400).json({ error: "Signup failed" });
+    console.error("Signup error", e);
+    res.status(400).json({ error: "Signup failed", detail: e?.message || e });
   }
 });
 
@@ -102,8 +111,8 @@ app.post("/api/auth/login", async (req, res) => {
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
     res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
   } catch (e: any) {
-    console.error(e);
-    res.status(500).json({ error: "Login failed" });
+    console.error("Login error", e);
+    res.status(500).json({ error: "Login failed", detail: e?.message || e });
   }
 });
 
@@ -120,8 +129,8 @@ app.get("/api/sync/pull", authenticate, async (req: any, res) => {
     if (error) throw error;
     res.json({ changes: data });
   } catch (e: any) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to pull changes" });
+    console.error("Pull error", e);
+    res.status(500).json({ error: "Failed to pull changes", detail: e?.message || e });
   }
 });
 
@@ -132,8 +141,8 @@ app.post("/api/sync/push", authenticate, async (req: any, res) => {
     await upsertSyncData(changes, req.user.id, timestamp);
     res.json({ success: true, timestamp });
   } catch (e: any) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to push changes" });
+    console.error("Push error", e);
+    res.status(500).json({ error: "Failed to push changes", detail: e?.message || e });
   }
 });
 
