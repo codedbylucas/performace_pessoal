@@ -1,0 +1,21 @@
+{
+  "name": "Painel de Performance Pessoal",
+  "short_name": "Performance",
+  "description": "Gestão de performance pessoal mobile-first.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f0",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "https://picsum.photos/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

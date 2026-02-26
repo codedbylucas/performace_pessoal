@@ -1,0 +1,5 @@
+{
+  "name": "Painel de Performance Pessoal",
+  "description": "Um PWA mobile-first para gestão de performance pessoal, integrando saúde, estudos e produtividade com insights de IA.",
+  "requestFramePermissions": []
+}
